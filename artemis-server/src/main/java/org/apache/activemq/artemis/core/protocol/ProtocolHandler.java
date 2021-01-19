@@ -85,6 +85,10 @@ public class ProtocolHandler {
       return new ProtocolDecoder(true, false);
    }
 
+   public HttpKeepAliveRunnable getHttpKeepAliveRunnable() {
+      return httpKeepAliveRunnable;
+   }
+
    public void close() {
       if (httpKeepAliveRunnable != null) {
          httpKeepAliveRunnable.close();
@@ -96,6 +100,8 @@ public class ProtocolHandler {
    }
 
    class ProtocolDecoder extends ByteToMessageDecoder {
+
+      private static final String HTTP_HANDLER = "http-handler";
 
       private final boolean http;
 
@@ -132,7 +138,7 @@ public class ProtocolHandler {
                ctx.pipeline().addLast("websocket-handler", new WebSocketServerHandler(websocketSubprotocolIds, ConfigurationHelper.getIntProperty(TransportConstants.STOMP_MAX_FRAME_PAYLOAD_LENGTH, TransportConstants.DEFAULT_STOMP_MAX_FRAME_PAYLOAD_LENGTH, nettyAcceptor.getConfiguration())));
                ctx.pipeline().addLast(new ProtocolDecoder(false, false));
                ctx.pipeline().remove(this);
-               ctx.pipeline().remove("http-handler");
+               ctx.pipeline().remove(HTTP_HANDLER);
                ctx.fireChannelRead(msg);
             } else if (upgrade != null && upgrade.equalsIgnoreCase(NettyConnector.ACTIVEMQ_REMOTING)) { // HORNETQ-1391
                // Send the response and close the connection if necessary.
@@ -237,7 +243,7 @@ public class ProtocolHandler {
          }
          long httpResponseTime = ConfigurationHelper.getLongProperty(TransportConstants.HTTP_RESPONSE_TIME_PROP_NAME, TransportConstants.DEFAULT_HTTP_RESPONSE_TIME, nettyAcceptor.getConfiguration());
          HttpAcceptorHandler httpHandler = new HttpAcceptorHandler(httpKeepAliveRunnable, httpResponseTime, ctx.channel());
-         ctx.pipeline().addLast("http-handler", httpHandler);
+         ctx.pipeline().addLast(HTTP_HANDLER, httpHandler);
          p.addLast(new ProtocolDecoder(false, true));
          p.remove(this);
       }

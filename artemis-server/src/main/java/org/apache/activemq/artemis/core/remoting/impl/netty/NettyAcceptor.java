@@ -449,6 +449,11 @@ public class NettyAcceptor extends AbstractAcceptor {
       return name;
    }
 
+   // Only for testing purposes
+   public ProtocolHandler getProtocolHandler() {
+      return protocolHandler;
+   }
+
    // only for testing purposes
    public void setKeyStorePath(String keyStorePath) {
       this.keyStorePath = keyStorePath;

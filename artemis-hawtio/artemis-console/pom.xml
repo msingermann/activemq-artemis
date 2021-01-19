@@ -76,7 +76,6 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>${war-plugin-version}</version>
         <configuration>
-          <useCache>true</useCache>
           <packagingExcludes>**/lib/slf4j*.jar</packagingExcludes>
           <failOnMissingWebXml>false</failOnMissingWebXml>
           <webResources>
